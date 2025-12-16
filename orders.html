@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .order-card { background: white; padding: 15px; margin-bottom: 5px; border-bottom: 1px solid #f0f0f0; }
+        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+        .status-Pending { background: #fff3cd; color: #856404; }
+        .status-Shipped { background: #d1ecf1; color: #0c5460; }
+        .status-Delivered { background: #d4edda; color: #155724; }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html"><i class="fas fa-arrow-left"></i></a>
+        <div class="brand">My Orders</div>
+        <button id="logout-btn" style="background:none; border:none; color:white;"><i class="fas fa-sign-out-alt"></i></button>
+    </nav>
+
+    <div id="orders-list" style="padding-top:10px;">
+        <div class="loader" style="position:relative; margin: 50px auto;"></div>
+    </div>
+
+    <script type="module">
+        import { db } from './js/firebase.js';
+        import { collection, query, where, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { checkAuth, logout } from './js/auth.js';
+        import { formatPrice } from './js/ui.js';
+
+        document.getElementById('logout-btn').onclick = logout;
+
+        checkAuth((user) => {
+            if(!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const q = query(
+                collection(db, "orders"), 
+                where("userId", "==", user.uid),
+                orderBy("createdAt", "desc")
+            );
+
+            onSnapshot(q, (snapshot) => {
+                const container = document.getElementById('orders-list');
+                container.innerHTML = '';
+
+                if(snapshot.empty) {
+                    container.innerHTML = '<div style="text-align:center; padding:20px;">No orders found</div>';
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const order = doc.data();
+                    const date = order.createdAt ? order.createdAt.toDate().toLocaleDateString() : 'Just now';
+                    
+                    let itemsHtml = order.items.map(item => 
+                        `<div style="display:flex; margin-top:10px; font-size:0.9rem; color:#555;">
+                            <span style="flex:1;">${item.name} (x${item.qty})</span>
+                        </div>`
+                    ).join('');
+
+                    const card = `
+                        <div class="order-card">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                                <span class="status-badge status-${order.status}">${order.status}</span>
+                                <span style="font-size:0.8rem; color:#888;">${date}</span>
+                            </div>
+                            ${itemsHtml}
+                            <div style="margin-top:15px; border-top:1px solid #eee; padding-top:10px; display:flex; justify-content:space-between;">
+                                <span>Total Order Price</span>
+                                <span style="font-weight:bold;">${formatPrice(order.total)}</span>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += card;
+                });
+            });
+        });
+    </script>
+</body>
+</html>

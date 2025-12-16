@@ -1,0 +1,20 @@
+<script type="module">
+    import { db } from './js/firebase.js';
+    import { collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const products = [
+        { name: "iPhone 15", price: 79999, mrp: 89999, category: "Mobiles", image: "https://placehold.co/400x400/png?text=iPhone+15", description: "Latest Apple iPhone", stock: 10 },
+        { name: "Nike Shoes", price: 2499, mrp: 4999, category: "Fashion", image: "https://placehold.co/400x400/png?text=Nike+Shoe", description: "Running shoes", stock: 20 },
+        { name: "Sony Bravia 55", price: 54999, mrp: 85000, category: "Home", image: "https://placehold.co/400x400/png?text=Sony+TV", description: "4K Smart TV", stock: 5 }
+    ];
+
+    const banner = { imageUrl: "https://placehold.co/800x400/2874f0/white?text=Big+Sale", link: "#", order: 1 };
+
+    async function seed() {
+        console.log("Seeding...");
+        for(let p of products) await addDoc(collection(db, "products"), p);
+        await addDoc(collection(db, "banners"), banner);
+        alert("Database Seeded! Delete this file.");
+    }
+    seed();
+</script>

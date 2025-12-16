@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopApp</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="brand">ShopApp</div>
+        <div class="nav-icons">
+            <a href="login.html"><i class="fas fa-user"></i></a>
+            <a href="orders.html"><i class="fas fa-box"></i></a>
+            <a href="cart.html"><i class="fas fa-shopping-cart"></i><span id="cart-badge" class="badge">0</span></a>
+        </div>
+    </nav>
+
+    <div class="banner-container">
+        <img id="banner-img" class="banner-img" src="" alt="Offer">
+    </div>
+
+    <div style="display:flex; gap:10px; padding:10px; overflow-x:auto; background:white;">
+        <button class="btn-outline" style="min-width:80px; padding:5px;" onclick="filter('Mobiles')">Mobiles</button>
+        <button class="btn-outline" style="min-width:80px; padding:5px;" onclick="filter('Fashion')">Fashion</button>
+        <button class="btn-outline" style="min-width:80px; padding:5px;" onclick="filter('Home')">Home</button>
+        <button class="btn-outline" style="min-width:80px; padding:5px;" onclick="window.location.reload()">All</button>
+    </div>
+
+    <div class="section-title">Latest Products</div>
+    <div id="product-list" class="product-grid"></div>
+
+    <div id="loader" class="loader hidden"></div>
+    <div id="toast" class="toast"></div>
+
+    <script type="module">
+        import { loadProducts, loadBanners } from './js/products.js';
+        import { updateBadge } from './js/cart.js';
+        
+        loadBanners('banner-img');
+        loadProducts('product-list');
+        updateBadge();
+
+        window.filter = (cat) => loadProducts('product-list', cat);
+    </script>
+</body>
+</html>

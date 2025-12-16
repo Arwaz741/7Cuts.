@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Cart</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="index.html">Back</a>
+        <div class="brand">My Cart</div>
+        <div></div>
+    </nav>
+
+    <div id="cart-items"></div>
+    
+    <div class="section-title" style="display:flex; justify-content:space-between;">
+        <span>Total Amount</span>
+        <span id="total-price" style="font-weight:bold">₹0</span>
+    </div>
+
+    <div class="bottom-nav">
+        <button onclick="window.location.href='checkout.html'" class="btn btn-secondary">PLACE ORDER</button>
+    </div>
+
+    <script type="module">
+        import { getCart, removeFromCart } from './js/cart.js';
+        import { formatPrice } from './js/ui.js';
+
+        function render() {
+            const cart = getCart();
+            const container = document.getElementById('cart-items');
+            container.innerHTML = '';
+            let total = 0;
+
+            cart.forEach(item => {
+                total += item.price * item.qty;
+                container.innerHTML += `
+                    <div class="cart-item">
+                        <img src="${item.image}" style="width:80px; height:80px; object-fit:contain">
+                        <div class="cart-details">
+                            <div class="p-title">${item.name}</div>
+                            <div class="p-price">${formatPrice(item.price)}</div>
+                            <div class="qty-control">
+                                <button class="qty-btn" onclick="window.removeItem('${item.id}')">-</button>
+                                <span class="qty-val">${item.qty}</span>
+                                <button class="qty-btn">+</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('total-price').innerText = formatPrice(total);
+        }
+
+        window.removeItem = (id) => {
+            removeFromCart(id);
+            render();
+        };
+        render();
+    </script>
+</body>
+</html>
